@@ -1,0 +1,86 @@
+name: Bug Report
+description: A rule misbehaves or the plugin breaks
+title: "fix(<scope>): <one-line symptom>"
+labels: ["type:fix"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Title style — Hybrid Convention
+
+        Bug issues use the `fix` type and describe the observable symptom in one line: `fix(<scope>): <symptom>`.
+
+        Examples:
+
+        - `fix(no-direct-date): flags Date passed as a function argument`
+        - `fix(sort-imports): autofix drops a trailing comment`
+        - `fix(rule-tester): crashes on a template literal type`
+
+        Prohibited in any title: `+` as shorthand. Use `and` or commas.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One sentence describing the symptom in plain language.
+      placeholder: "no-direct-date reports `new Date(arg)` even when it is passed through a wrapper, which it should ignore."
+    validations:
+      required: true
+
+  - type: input
+    id: rule
+    attributes:
+      label: Affected rule
+      description: The rule name, or "plugin" if it is not rule-specific.
+      placeholder: "no-direct-date"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options:
+        - False positive (flags valid code)
+        - False negative (misses invalid code)
+        - Crash or error
+        - Autofix produces wrong output
+        - Documentation mismatch
+    validations:
+      required: true
+
+  - type: input
+    id: plugin_version
+    attributes:
+      label: Plugin version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: eslint_version
+    attributes:
+      label: ESLint version
+      placeholder: "10.0.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Minimal source plus the flat-config snippet that enables the rule. The smallest input that triggers the bug.
+      render: ts
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_actual
+    attributes:
+      label: Expected vs actual
+      description: What the rule should do, and what it does instead.
+      placeholder: |
+        - Expected: no report on `wrap(new Date())`
+        - Actual: reports `no-direct-date` on the inner `new Date()`
+    validations:
+      required: true

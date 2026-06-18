@@ -1,0 +1,95 @@
+language: en-US
+reviews:
+  profile: assertive
+  high_level_summary: true
+  poem: false
+  auto_review:
+    enabled: true
+    drafts: false
+    ignore_title_keywords:
+      - "chore(release): version packages"
+  path_filters:
+    - "!**/dist/**"
+    - "!**/coverage/**"
+    - "!pnpm-lock.yaml"
+  path_instructions:
+    - path: packages/eslint-plugin-friday/src/rules/*.ts
+      instructions: >-
+        Review each rule against the repo's hard conventions, focusing on what
+        ESLint cannot catch.
+
+        DRY: if logic such as a node predicate, walker, RuleFix builder, or
+        string transform duplicates something in another rule, flag it and name
+        the shared module it belongs in among core/, constants/, ast/, fixers/,
+        or text/. Do not accept the same logic reimplemented across rules.
+
+        Skeleton symmetry: every rule file must follow one structure — external
+        @typescript-eslint/utils imports, then local shared-module imports from
+        core/, ast/, fixers/, and text/, then createRule with name, meta,
+        defaultOptions, and create, then export default. Flag any deviation in
+        import order or shape against sibling rules.
+
+        createRule: rules must be built with createRule from core/create-rule.js.
+        Flag any re-creation of ESLintUtils.RuleCreator.
+
+        Wiring completeness: a new rule must be registered in src/rules/index.ts
+        and added to a severity array in src/configs/base.ts or react.ts, with the
+        array entry matching the createRule name. Flag a new rule that adds the
+        file but misses either wiring point.
+
+        Paired files: a new rule must ship with tests/rules/<name>.test.ts and
+        docs/rules/<name>.md. Flag a new rule missing either. A JSX or React rule
+        must use createRuleTester(true) in its test.
+
+        Do not comment on .js import suffixes, import type usage, or source
+        comments. ESLint already enforces those.
+    - path: packages/eslint-plugin-friday/src/{core,constants,ast,fixers,text}/**/*.ts
+      instructions: >-
+        The shared layer is five domain folders split by the kind of value each
+        module operates on: core/ for rule infrastructure, constants/ for static
+        literal data, ast/ for TSESTree helpers, fixers/ for RuleFix builders, and
+        text/ for pure string helpers.
+
+        Folder placement: flag a helper in the wrong folder, such as a
+        string-in/string-out function outside text/, an AST-node-in/RuleFix-out
+        builder outside fixers/, or an AST predicate or walker outside ast/. Never
+        accept a new catch-all utils/ folder. A new module goes in the folder
+        named after the value it operates on, or a new domain folder if it fits
+        none of the five.
+
+        Constants granularity: each constants/ file must export exactly one named
+        constant with a kebab-case filename matching it. Flag grouping unrelated
+        constants in one file.
+
+        Leaf rule: the shared folders are the bottom layer. Flag any import from
+        rules/ or configs/ into a shared module. Shared must stay leaf.
+
+        Test mirroring: a module under src/<domain>/ is tested by
+        tests/<domain>/<name>.test.ts. Flag a new shared module missing its
+        mirrored test.
+    - path: packages/eslint-plugin-friday/tests/rules/*.ts
+      instructions: >-
+        Each rule test runs on vitest and @typescript-eslint/rule-tester through
+        the tests/setup.ts helper createRuleTester. Coverage is gated at 100
+        percent, so verify the test exercises valid cases, invalid cases with the
+        expected messageId, every fixer output where the rule is fixable, and each
+        option branch. Flag missing valid, invalid, fix, or option cases.
+
+        A JSX or React rule must call createRuleTester(true). Flag a JSX rule test
+        that uses the default tester.
+    - path: "**/*.md"
+      instructions: >-
+        Prose style: parentheses are for code only such as identifiers, commands,
+        and signatures. Flag a requirement, caveat, example, or enumeration
+        written inside parentheses and ask for a full sentence instead.
+
+        Artifacts stand alone: docs must be self-contained and never reference
+        another repository, even as inspiration. Flag any cross-repository
+        reference.
+
+        Generated docs: each file under docs/rules/ and the rules table in
+        README.md are produced by eslint-doc-generator. Review the authored prose
+        such as rationale and examples; do not flag the generated header, options
+        table, or rules list.
+chat:
+  auto_reply: true

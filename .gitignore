@@ -1,0 +1,14 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+.turbo
+*.tsbuildinfo
+
+# Test coverage
+coverage
+
+# Claude Code
+.claude/settings.local.json
+.claude/scheduled_tasks.lock

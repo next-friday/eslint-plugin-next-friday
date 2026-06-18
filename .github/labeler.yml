@@ -1,0 +1,53 @@
+"area:rules":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "packages/eslint-plugin-friday/src/rules/**"
+          - "packages/eslint-plugin-friday/src/core/**"
+          - "packages/eslint-plugin-friday/src/ast/**"
+          - "packages/eslint-plugin-friday/src/fixers/**"
+          - "packages/eslint-plugin-friday/src/text/**"
+          - "packages/eslint-plugin-friday/src/constants/**"
+          - "packages/eslint-plugin-friday/tests/**"
+
+"area:configs":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "packages/eslint-plugin-friday/src/configs/**"
+          - "packages/eslint-plugin-friday/src/index.ts"
+
+"area:docs":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/*.md"
+          - "**/LICENSE"
+          - "packages/eslint-plugin-friday/docs/**"
+
+"area:ci":
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/**"
+
+"area:tooling":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/*.config.{ts,mjs,js,cjs}"
+          - "**/.dependency-cruiser.*"
+          - "**/package.json"
+          - "**/tsconfig.json"
+          - ".changeset/**"
+          - ".claude/**"
+          - ".commitlintrc*"
+          - ".editorconfig"
+          - ".gitignore"
+          - ".husky/**"
+          - ".lintstagedrc*"
+          - ".npmrc"
+          - ".nvmrc"
+          - ".prettierignore"
+          - ".prettierrc*"
+          - ".vscode/**"
+          - "knip.json"
+          - "pnpm-lock.yaml"
+          - "pnpm-workspace.yaml"
+          - "sonar-project.properties"
+          - "turbo.json"
