@@ -1,0 +1,110 @@
+name: Pull Request Validation
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+concurrency:
+  group: pr-validate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  VALIDATE: ${{ github.event.pull_request.user.login != 'dependabot[bot]' && !startsWith(github.head_ref, 'changeset-release/') }}
+
+jobs:
+  validate:
+    name: Validate pull request
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    if: ${{ github.event.pull_request.draft == false }}
+    permissions:
+      contents: read
+      issues: read
+    steps:
+      - uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+        if: ${{ env.VALIDATE == 'true' }}
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: ./.github/common-actions/bootstrap
+        if: ${{ env.VALIDATE == 'true' }}
+      - name: Title follows the Hybrid Convention
+        if: ${{ env.VALIDATE == 'true' }}
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: echo "$PR_TITLE" | pnpm exec commitlint
+      - name: Title carries no issue ref and body closes one
+        if: ${{ env.VALIDATE == 'true' }}
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: bash .github/scripts/check-pr-title-references.sh
+      - name: Branch points at a real open issue
+        if: ${{ env.VALIDATE == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD: ${{ github.head_ref }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [[ ! "$HEAD" =~ ^[0-9]+- ]]; then
+            echo "::error::Head branch must be created from an issue (gh issue develop <n>); got '$HEAD'." >&2
+            exit 1
+          fi
+          n="${HEAD%%-*}"
+          state=$(gh issue view "$n" --repo "$REPO" --json state --jq .state)
+          if [ "$state" != "OPEN" ]; then
+            echo "::error::Issue #$n referenced by branch '$HEAD' is not open (state: $state)." >&2
+            exit 1
+          fi
+          echo "Branch is linked to open issue #$n"
+      - name: Behavior-changing types require a changeset
+        if: ${{ env.VALIDATE == 'true' }}
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          type="${PR_TITLE%%(*}"
+          case "$type" in
+            feat|fix|perf|refactor) ;;
+            *) echo "Type '$type' does not require a changeset"; exit 0 ;;
+          esac
+          if git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -q '^\.changeset/.*\.md$'; then
+            echo "Changeset found"
+          else
+            echo "::error::PR type '$type' changes behavior — add a changeset (pnpm changeset)." >&2
+            exit 1
+          fi
+
+  title-sync:
+    name: Sync status:needs-pr-title-fix label
+    needs: [validate]
+    if: ${{ always() && github.event.pull_request.draft == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411
+        with:
+          egress-policy: audit
+      - name: Add or remove status:needs-pr-title-fix based on validation
+        if: ${{ env.VALIDATE == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          VALIDATE_RESULT: ${{ needs.validate.result }}
+        run: |
+          if [ "$VALIDATE_RESULT" = "success" ]; then
+            gh pr edit "$PR" --repo "$REPO" --remove-label "status:needs-pr-title-fix" 2>/dev/null || true
+          else
+            gh pr edit "$PR" --repo "$REPO" --add-label "status:needs-pr-title-fix"
+          fi

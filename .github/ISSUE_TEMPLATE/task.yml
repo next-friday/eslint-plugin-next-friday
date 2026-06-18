@@ -1,0 +1,68 @@
+name: Task / Epic
+description: An engineering task or epic
+title: "<type>(<scope>): <verb-first outcome>"
+labels: ["type:chore"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Title style — Hybrid Convention
+
+        Every title uses `<type>(<scope>): <verb-first outcome>`. Replace the default `type:chore` label with the type that matches the work.
+
+        Examples:
+
+        - `refactor(utils): extract a shared prefix-boundary helper`
+        - `ci(github): pin third-party actions to commit sha`
+        - `docs(rules): add a migration note for renamed rules`
+
+        Prohibited in any title: `+` as shorthand. Use `and` or commas.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One or two sentences. What is the work and what end state does it produce?
+    validations:
+      required: true
+
+  - type: textarea
+    id: background
+    attributes:
+      label: Background
+      description: Prior state and the context that informs this work. Link related issues or decisions.
+    validations:
+      required: true
+
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      description: The outcome the work delivers, in a single declarative sentence.
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: The concrete pieces of work. Check them off as they land. Split into sub-issues if this exceeds one reviewable pull request.
+      value: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+
+  - type: dropdown
+    id: estimate
+    attributes:
+      label: Estimate
+      description: T-shirt size. Sets expectations, not a deadline.
+      options:
+        - XS (under two hours)
+        - S (half a day)
+        - M (one day)
+        - L (two to three days)
+        - XL (one week or longer)
+    validations:
+      required: true

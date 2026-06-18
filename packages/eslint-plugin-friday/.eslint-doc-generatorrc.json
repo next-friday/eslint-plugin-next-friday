@@ -1,0 +1,11 @@
+{
+  "ignoreConfig": ["all", "all/recommended", "base", "react"],
+  "configEmoji": [
+    ["base/recommended", "✅"],
+    ["react/recommended", "⚛️"]
+  ],
+  "ruleDocTitleFormat": "name",
+  "ruleDocSectionOptions": false,
+  "ruleDocNotices": ["configs", "fixable"],
+  "pathRuleList": ["README.md", "../../README.md"]
+}

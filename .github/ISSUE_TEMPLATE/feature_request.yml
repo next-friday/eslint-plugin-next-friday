@@ -1,0 +1,76 @@
+name: Feature Request
+description: A new rule or an enhancement to an existing one
+title: "feat(<scope>): <verb-first outcome>"
+labels: ["type:feat"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Title style — Hybrid Convention
+
+        Use the conventional-commit shape: `feat(<scope>): <verb-first outcome>`. Issue titles share the shape with commits and pull requests; length is relaxed for issues.
+
+        Examples:
+
+        - `feat(rules): add a rule banning floating promises`
+        - `feat(no-emoji): allow an opt-in list of permitted glyphs`
+
+        Prohibited in any title: `+` as shorthand. Use `and` or commas.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One sentence in plain language. What should the rule enforce or allow?
+      placeholder: "A rule that flags `await` inside an array `.map` callback, which serializes unexpectedly."
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: The inconsistency, footgun, or unsafe pattern this would catch. Why a rule is the right tool.
+      placeholder: |
+        - Pattern: developers write `arr.map(async x => await f(x))` expecting concurrency
+        - Consequence: silent serialization and confusing performance bugs
+    validations:
+      required: true
+
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Proposed behavior
+      description: Show valid and invalid examples the rule should accept or report.
+      render: ts
+    validations:
+      required: true
+
+  - type: dropdown
+    id: preset
+    attributes:
+      label: Target preset
+      options:
+        - base (any TypeScript project)
+        - react (React/JSX projects)
+        - standalone (not enabled by a preset)
+    validations:
+      required: true
+
+  - type: textarea
+    id: options
+    attributes:
+      label: Options
+      description: Configuration the rule should accept, if any. State "none" when the rule has no options.
+      placeholder: |
+        - `allow`: string[] of identifiers to ignore
+    validations:
+      required: false
+
+  - type: textarea
+    id: when_not
+    attributes:
+      label: When not to use
+      description: Cases where a project would reasonably disable this rule.
+    validations:
+      required: false

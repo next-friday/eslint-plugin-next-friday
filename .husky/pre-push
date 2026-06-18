@@ -1,0 +1,20 @@
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks git --no-banner --redact
+else
+  echo "gitleaks not installed — skipping secret scan (brew install gitleaks)"
+fi
+if command -v actionlint >/dev/null 2>&1; then
+  actionlint
+else
+  echo "actionlint not installed — skipping workflow lint (brew install actionlint)"
+fi
+pnpm -w format:check
+pnpm -w sort:check
+pnpm -w lint
+pnpm -w knip
+pnpm -w depcruise
+pnpm -w typecheck
+pnpm -w build
+pnpm -w doc:check
+pnpm -w test
+pnpm audit --audit-level high

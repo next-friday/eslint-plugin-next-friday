@@ -1,0 +1,12 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": ["eslint-remote-tester.config.ts"],
+      "ignoreDependencies": ["eslint-plugin-friday"]
+    },
+    "packages/eslint-plugin-friday": {
+      "entry": ["src/core/create-rule.ts"]
+    }
+  }
+}

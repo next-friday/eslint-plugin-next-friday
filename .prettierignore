@@ -1,0 +1,12 @@
+# dependencies
+node_modules
+pnpm-lock.yaml
+
+# build output
+dist
+coverage
+.turbo
+
+# eslint-doc-generator owns this file; its emoji rules table conflicts with prettier
+packages/eslint-plugin-friday/README.md
+/README.md
